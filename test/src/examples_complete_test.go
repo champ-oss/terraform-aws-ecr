@@ -9,14 +9,13 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"log"
-	"os"
 	"testing"
 )
 
 // create a new session
 func NewSession() *ecr.ECR {
-	region := os.Getenv("AWS_DEFAULT_REGION")
-	config := &aws.Config{Region: aws.String(region)}
+
+	config := &aws.Config{Region: aws.String("us-east-1")}
 	svc := ecr.New(session.New(), config)
 
 	return svc
@@ -43,6 +42,7 @@ func TestExamplesComplete(t *testing.T) {
 	t.Parallel()
 
 	repositories := []string{"repo1", "repo2", "repo3"}
+
 
 	defer deleteRepo("repo1")
 	defer deleteRepo("repo2")
