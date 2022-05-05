@@ -28,7 +28,7 @@ resource "aws_ecr_repository" "this" {
 }
 
 resource "aws_ecr_repository_policy" "ecr_policy" {
-  count      = var.trusted_accounts != [] ? 1 : 0
+  count      = var.trusted_accounts != null ? 1 : 0
   repository = aws_ecr_repository.this.name
   policy     = data.aws_iam_policy_document.resource_readonly_access.json
 }
