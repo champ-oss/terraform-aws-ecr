@@ -35,6 +35,6 @@ variable "scan_on_push" {
 
 variable "trusted_accounts" {
   description = "trusted accounts that are allowed to pull images"
-  type        = any
+  type        = list(any)
   default     = null
 }
