@@ -21,6 +21,9 @@ resource "aws_ecr_repository" "this" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [
+      encryption_configuration["encryption_type"] # ignore kms repos that were manually created and can't be migrated without destroy
+    ]
   }
 }
 
@@ -31,8 +34,8 @@ resource "aws_ecr_repository_policy" "ecr_policy" {
 }
 
 data "aws_iam_policy_document" "resource_readonly_access" {
-
   statement {
+    sid    = "production-access"
     effect = "Allow"
 
     principals {
@@ -41,8 +44,11 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     }
 
     principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+      type = "Service"
+      identifiers = [
+        "ec2.amazonaws.com",
+        "lambda.amazonaws.com"
+      ]
     }
 
     actions = [
@@ -58,3 +64,4 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     ]
   }
 }
+
