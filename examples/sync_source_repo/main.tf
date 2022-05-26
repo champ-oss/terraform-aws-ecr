@@ -12,6 +12,7 @@ module "this" {
 }
 
 # Verify the image and tag exist in ECR
+# tflint-ignore: terraform_unused_declarations
 data "aws_ecr_image" "this" {
   depends_on      = [module.this]
   repository_name = "terraform-aws-ecr/ubuntu-test"
