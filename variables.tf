@@ -38,3 +38,33 @@ variable "trusted_accounts" {
   type        = list(any)
   default     = null
 }
+
+variable "sync_image" {
+  description = "Sync a specific docker image tag from another location (ex: Docker Hub) to ECR"
+  type        = bool
+  default     = false
+}
+
+variable "sync_source_repo" {
+  description = "Name of the source docker repo to sync (ex: myaccount/myrepo)"
+  type        = string
+  default     = ""
+}
+
+variable "sync_source_tag" {
+  description = "Image tag to sync (ex: v1.0.0)"
+  type        = string
+  default     = ""
+}
+
+variable "sync_retries" {
+  description = "How many times to attempt to sync the source docker image tag"
+  type        = number
+  default     = 60
+}
+
+variable "sync_sleep_seconds" {
+  description = "Seconds to wait between attempts to sync the source docker image tag"
+  type        = number
+  default     = 10
+}
