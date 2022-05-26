@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -18,6 +19,8 @@ func TestSyncSourceRepoInvalid(t *testing.T) {
 		NoColor:      true,
 	})
 	output, err := terraform.InitAndApplyAndIdempotentE(t, terraformOptions)
+	assert.Error(t, err)
+
 	fmt.Println(output)
 	fmt.Println(err)
 }
