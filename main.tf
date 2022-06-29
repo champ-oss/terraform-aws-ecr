@@ -20,7 +20,7 @@ resource "aws_ecr_repository" "this" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    //prevent_destroy = true
     ignore_changes = [
       encryption_configuration["encryption_type"] # ignore kms repos that were manually created and can't be migrated without destroy
     ]
