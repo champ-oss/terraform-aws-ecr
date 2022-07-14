@@ -10,6 +10,7 @@ resource "aws_ecr_repository" "this" {
   name                 = var.name
   image_tag_mutability = var.image_tag_mutability
   tags                 = merge(local.tags, var.tags)
+  force_delete         = var.force_delete
 
   encryption_configuration {
     encryption_type = var.encryption_type
@@ -20,7 +21,6 @@ resource "aws_ecr_repository" "this" {
   }
 
   lifecycle {
-    prevent_destroy = true
     ignore_changes = [
       encryption_configuration["encryption_type"] # ignore kms repos that were manually created and can't be migrated without destroy
     ]
