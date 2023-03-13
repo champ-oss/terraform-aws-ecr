@@ -63,7 +63,8 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     }
 
     principals {
-      type        = "Service"
+      type = "Service"
+
       identifiers = [
         "ec2.amazonaws.com",
         "lambda.amazonaws.com"
