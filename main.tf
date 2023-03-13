@@ -15,7 +15,7 @@ locals {
         selection = {
           tagStatus   = "any"
           countType   = "imageCountMoreThan"
-          countNumber = 8000
+          countNumber = var.image_limit
         }
       }
     ]
