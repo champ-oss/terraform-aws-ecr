@@ -13,8 +13,8 @@ locals {
         action       = { type = "expire" }
 
         selection = {
-          tagStatus = "any"
-          countType = "imageCountMoreThan"
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
           countNumber = 8000
         }
       }
@@ -38,7 +38,8 @@ resource "aws_ecr_repository" "this" {
 
   lifecycle {
     ignore_changes = [
-      encryption_configuration["encryption_type"] # ignore kms repos that were manually created and can't be migrated without destroy
+      encryption_configuration["encryption_type"]
+      # ignore kms repos that were manually created and can't be migrated without destroy
     ]
   }
 }
@@ -62,7 +63,7 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     }
 
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = [
         "ec2.amazonaws.com",
         "lambda.amazonaws.com"
@@ -88,4 +89,3 @@ resource "aws_ecr_lifecycle_policy" "this" {
   repository = aws_ecr_repository.this.name
   policy     = jsonencode(local.policy)
 }
-
