@@ -4,6 +4,22 @@ locals {
     creator = "terraform"
     git     = var.git
   }
+
+  policy = {
+    rules = [
+      {
+        rulePriority = 1
+        description  = "image count limit"
+        action       = { type = "expire" }
+
+        selection = {
+          tagStatus = "any"
+          countType = "imageCountMoreThan"
+          countNumber = 8000
+        }
+      }
+    ]
+  }
 }
 
 resource "aws_ecr_repository" "this" {
@@ -65,5 +81,11 @@ data "aws_iam_policy_document" "resource_readonly_access" {
       "ecr:ListImages",
     ]
   }
+}
+
+resource "aws_ecr_lifecycle_policy" "this" {
+  count      = var.image_limit != null ? 1 : 0
+  repository = aws_ecr_repository.this.name
+  policy     = jsonencode(local.policy)
 }
 
