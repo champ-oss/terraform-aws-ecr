@@ -4,6 +4,22 @@ locals {
     creator = "terraform"
     git     = var.git
   }
+
+  policy = {
+    rules = [
+      {
+        rulePriority = 1
+        description  = "image count limit"
+        action       = { type = "expire" }
+
+        selection = {
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = var.image_limit
+        }
+      }
+    ]
+  }
 }
 
 resource "aws_ecr_repository" "this" {
@@ -22,7 +38,8 @@ resource "aws_ecr_repository" "this" {
 
   lifecycle {
     ignore_changes = [
-      encryption_configuration["encryption_type"] # ignore kms repos that were manually created and can't be migrated without destroy
+      # ignore kms repos that were manually created and can't be migrated without destroy
+      encryption_configuration["encryption_type"]
     ]
   }
 }
@@ -47,6 +64,7 @@ data "aws_iam_policy_document" "resource_readonly_access" {
 
     principals {
       type = "Service"
+
       identifiers = [
         "ec2.amazonaws.com",
         "lambda.amazonaws.com"
@@ -67,3 +85,8 @@ data "aws_iam_policy_document" "resource_readonly_access" {
   }
 }
 
+resource "aws_ecr_lifecycle_policy" "this" {
+  count      = var.image_limit != null ? 1 : 0
+  repository = aws_ecr_repository.this.name
+  policy     = jsonencode(local.policy)
+}
