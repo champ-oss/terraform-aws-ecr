@@ -45,7 +45,7 @@ resource "aws_ecr_repository" "this" {
 }
 
 resource "aws_ecr_repository_policy" "ecr_policy" {
-  count      = var.trusted_accounts != null ? 1 : 0
+  count      = var.trusted_accounts != null || var.trusted_principal_org_paths != null ? 1 : 0
   repository = aws_ecr_repository.this.name
   policy     = data.aws_iam_policy_document.resource_readonly_access[0].json
 }
@@ -53,35 +53,71 @@ resource "aws_ecr_repository_policy" "ecr_policy" {
 data "aws_iam_policy_document" "resource_readonly_access" {
   count = var.trusted_accounts != null ? 1 : 0
 
-  statement {
-    sid    = "production-access"
-    effect = "Allow"
+  dynamic "statement" {
+    for_each = var.trusted_accounts != null ? [1] : []
+    content {
+      sid    = "account-access"
+      effect = "Allow"
 
-    principals {
-      type        = "AWS"
-      identifiers = var.trusted_accounts
-    }
+      principals {
+        type        = "AWS"
+        identifiers = var.trusted_accounts
+      }
 
-    principals {
-      type = "Service"
+      principals {
+        type = "Service"
+        identifiers = [
+          "ec2.amazonaws.com",
+          "lambda.amazonaws.com"
+        ]
+      }
 
-      identifiers = [
-        "ec2.amazonaws.com",
-        "lambda.amazonaws.com"
+      actions = [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:DescribeRepositories",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetLifecyclePolicy",
+        "ecr:GetLifecyclePolicyPreview",
+        "ecr:GetRepositoryPolicy",
+        "ecr:ListImages",
       ]
     }
+  }
 
-    actions = [
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:BatchGetImage",
-      "ecr:DescribeImages",
-      "ecr:DescribeRepositories",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:GetLifecyclePolicy",
-      "ecr:GetLifecyclePolicyPreview",
-      "ecr:GetRepositoryPolicy",
-      "ecr:ListImages",
-    ]
+  dynamic "statement" {
+    for_each = var.trusted_principal_org_paths != null ? [1] : []
+    content {
+      sid    = "org-access"
+      effect = "Allow"
+
+      principals {
+        type = "Service"
+        identifiers = [
+          "ec2.amazonaws.com",
+          "lambda.amazonaws.com"
+        ]
+      }
+
+      actions = [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:DescribeRepositories",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetLifecyclePolicy",
+        "ecr:GetLifecyclePolicyPreview",
+        "ecr:GetRepositoryPolicy",
+        "ecr:ListImages",
+      ]
+
+      condition {
+        test     = "ForAnyValue:StringLike"
+        variable = "aws:PrincipalOrgPaths"
+        values   = [var.trusted_principal_org_paths]
+      }
+    }
   }
 }
 

@@ -39,6 +39,12 @@ variable "trusted_accounts" {
   default     = null
 }
 
+variable "trusted_principal_org_paths" {
+  description = "https://aws.amazon.com/blogs/containers/sharing-amazon-ecr-repositories-with-multiple-accounts-using-aws-organizations"
+  type        = string
+  default     = null
+}
+
 variable "force_delete" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_repository#force_delete"
   type        = bool
