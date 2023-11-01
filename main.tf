@@ -51,7 +51,7 @@ resource "aws_ecr_repository_policy" "ecr_policy" {
 }
 
 data "aws_iam_policy_document" "resource_readonly_access" {
-  count = var.trusted_accounts != null ? 1 : 0
+  count = var.trusted_accounts != null || var.trusted_principal_org_paths != null ? 1 : 0
 
   dynamic "statement" {
     for_each = var.trusted_accounts != null ? [1] : []
