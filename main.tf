@@ -93,11 +93,8 @@ data "aws_iam_policy_document" "resource_readonly_access" {
       effect = "Allow"
 
       principals {
-        type = "Service"
-        identifiers = [
-          "ec2.amazonaws.com",
-          "lambda.amazonaws.com"
-        ]
+        type        = "AWS"
+        identifiers = ["*"]
       }
 
       actions = [
