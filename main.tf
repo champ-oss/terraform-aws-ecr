@@ -93,7 +93,7 @@ data "aws_iam_policy_document" "resource_readonly_access" {
       effect = "Allow"
 
       principals {
-        type = "AWS"
+        type        = "AWS"
         identifiers = ["*"]
       }
 
