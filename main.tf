@@ -97,6 +97,14 @@ data "aws_iam_policy_document" "resource_readonly_access" {
         identifiers = ["*"]
       }
 
+      principals {
+        type        = "Service"
+        identifiers = [
+          "lambda.amazonaws.com",
+          "ec2.amazonaws.com"
+        ]
+      }
+
       actions = [
         "ecr:BatchCheckLayerAvailability",
         "ecr:BatchGetImage",
