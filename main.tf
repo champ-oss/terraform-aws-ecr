@@ -111,7 +111,7 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     }
   }
 
-  # 3️⃣ Service access (Lambda + EC2)
+  # Service access (Lambda + EC2)
   statement {
     sid    = "grant-service-access"
     effect = "Allow"
