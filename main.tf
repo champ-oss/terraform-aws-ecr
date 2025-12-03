@@ -53,6 +53,7 @@ resource "aws_ecr_repository_policy" "ecr_policy" {
 data "aws_iam_policy_document" "resource_readonly_access" {
   count = var.trusted_accounts != null || var.trusted_principal_org_paths != null ? 1 : 0
 
+  # Account-based access
   dynamic "statement" {
     for_each = var.trusted_accounts != null ? [1] : []
     content {
@@ -62,14 +63,6 @@ data "aws_iam_policy_document" "resource_readonly_access" {
       principals {
         type        = "AWS"
         identifiers = var.trusted_accounts
-      }
-
-      principals {
-        type = "Service"
-        identifiers = [
-          "ec2.amazonaws.com",
-          "lambda.amazonaws.com"
-        ]
       }
 
       actions = [
@@ -86,6 +79,7 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     }
   }
 
+  #  Org-based access
   dynamic "statement" {
     for_each = var.trusted_principal_org_paths != null ? [1] : []
     content {
@@ -95,14 +89,6 @@ data "aws_iam_policy_document" "resource_readonly_access" {
       principals {
         type        = "AWS"
         identifiers = ["*"]
-      }
-
-      principals {
-        type        = "Service"
-        identifiers = [
-          "lambda.amazonaws.com",
-          "ec2.amazonaws.com"
-        ]
       }
 
       actions = [
@@ -124,7 +110,34 @@ data "aws_iam_policy_document" "resource_readonly_access" {
       }
     }
   }
+
+  # 3️⃣ Service access (Lambda + EC2)
+  statement {
+    sid    = "grant-service-access"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = [
+        "lambda.amazonaws.com",
+        "ec2.amazonaws.com"
+      ]
+    }
+
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:DescribeImages",
+      "ecr:DescribeRepositories",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetLifecyclePolicy",
+      "ecr:GetLifecyclePolicyPreview",
+      "ecr:GetRepositoryPolicy",
+      "ecr:ListImages",
+    ]
+  }
 }
+
 
 resource "aws_ecr_lifecycle_policy" "this" {
   count      = var.image_limit != null ? 1 : 0
