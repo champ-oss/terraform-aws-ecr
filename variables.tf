@@ -54,5 +54,5 @@ variable "force_delete" {
 variable "image_limit" {
   description = "If not null, a default lifecycle policy will be deployed to prune repository images to this limit"
   type        = number
-  default     = 8000
+  default     = 80000
 }
